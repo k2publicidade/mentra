@@ -76,6 +76,7 @@ export function createApp({dbPath=process.env.DB_PATH||resolve('data/mentra.sqli
  app.delete('/api/account',(req,res)=>{if(req.body.confirmation!=='EXCLUIR')fail(400,'Digite EXCLUIR para confirmar.');transaction(()=>db.prepare('DELETE FROM users WHERE id=?').run(req.user.id));res.clearCookie('mentra_session',{path:'/'}).json({ok:true});});
  app.use('/api',(req,res)=>res.status(404).json({error:'Rota não encontrada.'}));
  app.use(express.static(resolve(process.env.DIST_PATH||'dist'),{index:'index.html',dotfiles:'deny'}));
+ app.get(['/app','/app/'],(req,res)=>res.sendFile(resolve(process.env.DIST_PATH||'dist','index.html')));
  app.use((err,req,res,next)=>res.status(err.status||500).json({error:err.status?err.message:'Não foi possível concluir. Tente novamente.'}));
  return app;
 }

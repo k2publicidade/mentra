@@ -1,5 +1,17 @@
 # Verificação executada — MENTRA LIFE
 
+## Site principal e hero widescreen — 10/10/2026
+
+Site público em `/`, painel em `/app` e cadastro direto em `/app?cadastro=1`, com compatibilidade para os antigos hashes do painel. Navegação da PWA e retomada da página offline agora apontam para `/app`. Rotas locais e fallback da Vercel preservam acesso direto ao painel.
+
+Hero com fotografia original gerada por `image_gen`, luz natural, linho e folhas; telefone demonstrativo em HTML/CSS, texto e CTAs reais, separado da imagem. WebP 960/1920 pesa 28.092/74.954 bytes. Site inclui apresentação, recursos atuais, perfil/dados, passo a passo, faixa editorial, plano, FAQ com abertura nativa, CTA final, privacidade resumida e rodapé. Menu móvel abre/fecha, responde a Escape e fecha ao escolher destino. Animações de introdução e revelação ao entrar no viewport respeitam movimento reduzido.
+
+Plano Essencial a R$25/mês apresentado conforme solicitação do responsável. Sem fornecedor/checkout fornecido, os CTAs abrem cadastro real, sem prometer contratação ou cobrança; a indisponibilidade é explícita no plano e FAQ. Não foram inventados depoimentos, número de usuários, pagamentos, sincronização externa ou capacidades de IA. Metadata de compartilhamento, robots e sitemap incluídos.
+
+Build passou; `npm test`: 93/93; `npm run test:e2e`: 12/12. Após o ajuste final de rolagem, os dois testes do site passaram novamente. Testes cobrem quatro larguras (320/390/768/1440), imagens carregadas, âncoras, preço/disclosure, FAQ, menu/Escape, movimento reduzido, login e cadastro completos pelo CTA do plano até o painel, com sessão preservada após recarga e exclusão da conta descartável. Jornadas existentes do painel, persistência, erros, histórico e offline passaram na rota nova.
+
+Hero desktop/mobile, recursos desktop e plano mobile revisados visualmente em `test-results/landing-*.png`. Inspeção de geometria confirma cartões do hero dentro do viewport móvel e skip link fora da tela até foco. Validação em Chromium automatizado, sem aparelhos físicos. Cobrança real permanece pendente da configuração do checkout.
+
 ## Motion e carregamento — 10/10/2026
 
 Sistema CSS em `src/motion.css`, sem dependências novas: entrada das telas, hierarquia dos cartões, itens e mensagens, abertura do formulário, confirmação de ações, resposta ao toque e hover apenas em ponteiros precisos. Transições principais de 120–260 ms com deslocamentos pequenos; ilustração de entrada usa 420 ms. Navegação não aguarda a animação, e confirmação continua dependendo da resposta real do servidor.

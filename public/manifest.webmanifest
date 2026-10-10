@@ -4,7 +4,7 @@
   "short_name": "Mentra",
   "description": "Seu espaço pessoal para tarefas, agenda e memórias.",
   "lang": "pt-BR",
-  "start_url": "/#hoje",
+  "start_url": "/app#hoje",
   "scope": "/",
   "display": "standalone",
   "background_color": "#f7f7f2",
@@ -14,7 +14,7 @@
     {"src":"/icons/mentra-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
   ],
   "shortcuts": [
-    {"name":"Conversar com a Mentra","short_name":"Conversar","url":"/#mentra"},
-    {"name":"Meus registros","short_name":"Registros","url":"/#vida"}
+    {"name":"Conversar com a Mentra","short_name":"Conversar","url":"/app#mentra"},
+    {"name":"Meus registros","short_name":"Registros","url":"/app#vida"}
   ]
 }

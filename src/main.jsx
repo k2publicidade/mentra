@@ -1,9 +1,11 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App.jsx";
+import Landing from "./Landing.jsx";
 import "./styles.css";
 import "./experience.css";
 import "./motion.css";
+import "./landing.css";
 if (import.meta.env.PROD && 'serviceWorker' in navigator) {
   window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js').catch(() => {}));
 }
@@ -34,6 +36,6 @@ class ErrorBoundary extends React.Component {
 }
 createRoot(document.getElementById("root")).render(
   <ErrorBoundary>
-    <App />
+    {window.location.pathname === '/app' || window.location.pathname.startsWith('/app/') || /^#(hoje|mentra|vida|eu)$/.test(window.location.hash) ? <App /> : <Landing />}
   </ErrorBoundary>,
 );

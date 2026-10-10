@@ -6,6 +6,8 @@ Webapp PT-BR baseado no núcleo inicial de Mentra_Life_Mapa_de_Implementacao.pdf
 
 O backend online de Vercel usa Supabase Auth e PostgreSQL transacional sem migrar nem tocar no SQLite local. Aplicação publicada em https://mentra-tawny.vercel.app. Veja [ONLINE_DEPLOYMENT.md](ONLINE_DEPLOYMENT.md) para configuração e [VERIFICATION.md](VERIFICATION.md) para evidências e pendências. A confirmação de e-mail está temporariamente desativada por solicitação do responsável.
 
+A raiz `/` apresenta o site principal, com hero widescreen, recursos, passo a passo, plano Essencial de lançamento a R$25/mês, dúvidas e CTAs. O painel fica em `/app`; `/app?cadastro=1` abre diretamente o cadastro. Links antigos com `/#hoje`, `/#mentra`, `/#vida` e `/#eu` continuam acessando o painel. O preço foi solicitado pelo responsável; contratação e cobrança dependem da escolha/configuração do checkout e são identificadas como indisponíveis no site. Criar uma conta não gera cobrança. Imagem do hero e prompt em [design/landing/README.md](design/landing/README.md).
+
 ## Experiência móvel e organização
 
 Navegação inferior, atalhos de criação por tipo e formulário em painel inferior com ações fixas no celular. Hoje separa a agenda por dia, pendências anteriores, prioridades e registros sem data; datas seguem o fuso da conta. Vida oferece busca sem acentos, filtros combinados e ordenação por data, título ou criação. Filtros e rascunho da conversa permanecem durante a navegação da sessão; sair da conta os limpa.
@@ -60,7 +62,7 @@ Notificações são do navegador e dependem de permissão e da página aberta. N
 
 Calendário oferece exportação .ics, não sincronização bidirecional com Google/Apple/Microsoft. Importações repetidas podem duplicar itens no calendário externo, que não é controlado por este app.
 
-Premium, assinatura/cancelamento por operadora, cobrança, WhatsApp/Mentra Box, login social, recuperação de senha por e-mail e IA externa não estão ativos. Não existem preços aprovados no documento fornecido. Não há apps nativos iOS/Android: esta entrega é web responsiva.
+Premium, assinatura/cancelamento por operadora, cobrança, WhatsApp/Mentra Box, login social, recuperação de senha por e-mail e IA externa não estão ativos. O site apresenta o plano Essencial de lançamento a R$25/mês solicitado pelo responsável, sem checkout ativo. Não há apps nativos iOS/Android: esta entrega é web responsiva.
 
 Pessoas/projetos, documentos/imagens, busca semântica, reservas/compras e outras fases futuras do PDF não estão implementados.
 

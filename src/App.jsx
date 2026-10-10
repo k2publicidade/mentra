@@ -402,7 +402,7 @@ export default function App() {
   if (!user)
     return (
       <>
-        <Auth onSubmit={auth} busy={busy} error={error} />
+        <Auth onSubmit={auth} busy={busy} error={error} initialRegister={new URLSearchParams(window.location.search).get('cadastro') === '1'} />
         {toast && (
           <div className="toast" role="status">
             <Check size={18} />

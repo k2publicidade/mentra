@@ -35,7 +35,7 @@ test('captura, consulta, correção sem duplicação e privacidade',async({reque
 });
 test('jornada completa no navegador: cadastro, captura, edição, desfazer e persistência',async({page})=>{
   const credentials=account(); const errors=[]; page.on('pageerror',e=>errors.push(e.message));
-  await page.goto('/');
+  await page.goto('/app');
   await page.getByRole('button',{name:'Criar conta',exact:true}).click();
   await page.getByLabel('Seu nome', {exact:true}).fill(credentials.name);
   await page.getByLabel('E-mail',{exact:true}).fill(credentials.email);
@@ -83,7 +83,7 @@ test('jornada completa no navegador: cadastro, captura, edição, desfazer e per
 });
 test('memória manual com origem, erro de gravação visível e exclusão',async({page})=>{
   await register(page.request); await page.request.patch('/api/profile',{data:{onboarded:true}});
-  await page.goto('/');
+  await page.goto('/app');
   await page.getByRole('navigation',{name:'Navegação principal'}).getByRole('button',{name:'Vida',exact:true}).click();
   await page.getByRole('button',{name:'Novo registro',exact:true}).click();
   const dialog=page.getByRole('dialog');
@@ -106,7 +106,7 @@ test('memória manual com origem, erro de gravação visível e exclusão',async
 });
 test('interface pública carregada sem erros e responsiva',async({page})=>{
   const errors=[]; page.on('pageerror', e=>errors.push(e.message));
-  await page.goto('/'); await expect(page.getByText(/MENTRA/i).first()).toBeVisible();
+  await page.goto('/app'); await expect(page.getByText(/MENTRA/i).first()).toBeVisible();
   await expect(page.locator('input[type="email"]')).toBeVisible();
   await expect(page.locator('input[type="password"]')).toBeVisible();
   await expect.poll(()=>page.locator('.auth-art img').evaluate(img=>img.complete && img.naturalWidth > 0)).toBeTruthy();

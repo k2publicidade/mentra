@@ -30,7 +30,7 @@ test('mobile agenda, quick creation, persistent filters/draft, history and app i
     {type:'memory',title:'Ideia para o próximo encontro',source:'Minha anotação',notes:'Um lugar tranquilo para conversar.'},
   ];
   for(const data of seed) expect((await page.request.post('/api/items',{data})).ok()).toBeTruthy();
-  await page.goto('/');
+  await page.goto('/app');
   const nav=page.getByRole('navigation',{name:'Navegação principal'});
   await expect(page.getByRole('heading',{name:'Sua agenda',exact:true})).toBeVisible();
   const agenda=page.locator('.section-block').filter({has:page.getByRole('heading',{name:'Sua agenda',exact:true})});
@@ -108,7 +108,7 @@ test('mobile agenda, quick creation, persistent filters/draft, history and app i
 });
 
 test('installed app only caches its public offline fallback and never API responses', async ({page,context}) => {
-  await page.goto('/');
+  await page.goto('/app');
   const manifest=await (await page.request.get('/manifest.webmanifest')).json();
   expect(manifest.display).toBe('standalone');
   for(const icon of manifest.icons) expect((await page.request.get(icon.src)).ok()).toBeTruthy();

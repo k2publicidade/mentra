@@ -12,7 +12,7 @@ for(const reducedMotion of ['no-preference','reduce']) {
     try {
       await page.request.patch('/api/profile',{data:{onboarded:true}});
       await page.route('**/api/items',async route=>{if(route.request().method()==='GET')await pending;await route.continue();});
-      await page.goto('/');
+      await page.goto('/app');
       await expect(page.getByText('Buscando seus registros…')).toBeVisible();
       const progress=page.getByRole('progressbar',{name:'Atualizando registros',exact:true});
       await expect(progress).toBeVisible();
