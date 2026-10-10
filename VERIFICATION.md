@@ -1,5 +1,13 @@
 # Verificação executada — MENTRA LIFE
 
+## Coleção de imagens 3D — 10/10/2026
+
+Três ilustrações originais geradas com `image_gen`: equilíbrio/folha, agenda e conversa, em verde sálvia e marfim, acabamento fosco e transparência real. Mestres e prompts em `design/3d`; versões responsivas WebP 320/640 e fallback PNG em `public/artwork`. WebP 320 tem 11,5–14,7 KB por arquivo, e 640 tem 28,8–35,8 KB. Alfa dos três mestres confirmado durante preparação com Sharp.
+
+Entrada recebe a composição de equilíbrio; Vida sem registros reutiliza a imagem; a agenda vazia recebe o calendário e a conversa inicial recebe os balões. O componente reserva proporção/dimensões, decodifica de forma assíncrona, carrega sob demanda e usa prioridade baixa. Imagens são decorativas, com alt vazio e aria-hidden; textos e botões permanecem acessíveis e fora das imagens.
+
+Build passou e os sete testes de núcleo/experiência passaram após integração. Capturas `artwork-auth-desktop.png`, `artwork-auth-mobile.png`, `artwork-agenda-mobile.png` e `ux-chat-mobile.png` revisadas visualmente. Verificação do carregamento real dos arquivos incluída nas capturas; quatro telas continuam sem transbordamento de 320 a 1440 pixels. Também corrigido espaço entre linhas do título público quando as quebras são ocultas no celular.
+
 ## Experiência de app e organização — 10/10/2026
 
 Revisão das quatro telas com tipografia maior, cartões, navegação inferior, áreas seguras do celular, formulário em painel inferior, ações fixas e adaptação à altura visível do teclado. Hoje oferece agenda por dia/semana, números derivados dos registros, prioridades, revisão de datas anteriores e lista sem data. Vida combina busca sem acentos, filtros e ordenação. Filtros e rascunho permanecem ao trocar de tela, e são limpos ao sair da conta. Histórico do navegador acompanha as abas.

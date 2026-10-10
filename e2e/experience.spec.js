@@ -8,6 +8,9 @@ async function shot(page,name,fullPage=false) {
   const confirmation = page.getByRole('button',{name:'Fechar confirmação'});
   if (await confirmation.count()) await confirmation.click();
   await page.evaluate(()=>{ document.querySelector('#main')?.focus({preventScroll:true}); window.scrollTo(0,0); });
+  for (const img of await page.locator('.artwork img').all()) {
+    if (await img.isVisible()) await expect.poll(()=>img.evaluate(node=>node.complete && node.naturalWidth > 0)).toBeTruthy();
+  }
   await page.screenshot({path:`test-results/${name}.png`,fullPage,animations:'disabled'});
 }
 
@@ -46,6 +49,10 @@ test('mobile agenda, quick creation, persistent filters/draft, history and app i
   await page.getByRole('button',{name:'Desfazer',exact:true}).click();
   await expect(agenda).not.toContainText('Preparar apresentação');
   await shot(page,'ux-today-mobile');
+  await page.getByLabel('Dia da agenda').fill(shiftDay(today,2));
+  await agenda.locator('.empty-art').scrollIntoViewIfNeeded();
+  await expect.poll(()=>agenda.locator('.empty-art img').evaluate(img=>img.complete && img.naturalWidth > 0)).toBeTruthy();
+  await page.screenshot({path:'test-results/artwork-agenda-mobile.png',fullPage:false,animations:'disabled'});
   await nav.getByRole('button',{name:'Vida',exact:true}).click();
   await page.getByLabel('Buscar registros').fill('cafe');
   await page.getByRole('button',{name:'Prioridades',exact:true}).click();

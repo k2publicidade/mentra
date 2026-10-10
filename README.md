@@ -12,6 +12,8 @@ Navegação inferior, atalhos de criação por tipo e formulário em painel infe
 
 Em Eu, use **Adicionar à tela inicial** para instalar a versão web como app. O manifesto inclui atalhos para a conversa e os registros. A instalação não oferece gravação offline nem notificações push: o service worker guarda somente uma página pública de orientação quando não há conexão, e nunca armazena respostas de API ou dados da conta. Ações continuam dependendo da confirmação do servidor.
 
+A coleção de ilustrações 3D usa fundo transparente, cores da identidade e WebP responsivo. Mestres, prompts e detalhes de preparação estão em [design/3d/README.md](design/3d/README.md).
+
 ## Rodar localmente
 
 Requisitos: Node.js 24 ou superior e npm.

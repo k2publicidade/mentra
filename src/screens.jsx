@@ -26,6 +26,7 @@ import { mergeTranscript } from "./voice.js";
 import { TYPES, formatDate, toDateTimeInput, zonedInputToISO } from "./lib.js";
 import { agendaFor, dayKey, shiftDay, searchItems } from './ux.js';
 import { InstallApp } from './InstallApp.jsx';
+import { Artwork } from './Artwork.jsx';
 
 export const typeIcons = {
   task: ListTodo,
@@ -46,10 +47,10 @@ export function Brand({ compact = false }) {
     </div>
   );
 }
-export function Empty({ title, children, action }) {
+export function Empty({ title, children, action, illustration }) {
   return (
     <div className="empty">
-      <span className="empty-line" />
+      {illustration ? <Artwork name={illustration} className="empty-art" sizes="112px"/> : <span className="empty-line" />}
       <h3>{title}</h3>
       {children && <p>{children}</p>}
       {action}
@@ -136,9 +137,9 @@ export function Auth({ onSubmit, busy, error, initialRegister = false }) {
         <div className="story-copy">
           <p className="eyebrow">MENOS RUÍDO. MAIS PRESENÇA.</p>
           <h1>
-            Uma vida inteira.
+            Uma vida inteira.{" "}
             <br />
-            Um lugar para
+            Um lugar para{" "}
             <br />
             <em>organizar.</em>
           </h1>
@@ -147,6 +148,7 @@ export function Auth({ onSubmit, busy, error, initialRegister = false }) {
             Tire da cabeça. Volte para a vida.
           </p>
         </div>
+        <Artwork name="balance" className="auth-art" sizes="(max-width: 700px) 88px, 240px" eager/>
         <div className="story-foot">
           <span className="small-orbit" /> Um espaço seu, no seu ritmo.
         </div>
@@ -531,7 +533,7 @@ export function Today(props) {
               ))}
             </div>
           ) : (
-            <Empty title="Um dia com espaço livre.">
+            <Empty title="Um dia com espaço livre." illustration="agenda">
               Nenhum registro pendente nesta data.
               <button className="text-button" onClick={() => onEdit({type:'event',dueAt:zonedInputToISO(`${selectedDay}T09:00`,user.timezone)})}>Adicionar compromisso <Plus size={16}/></button>
             </Empty>
@@ -668,6 +670,7 @@ export function Life(props) {
         </div>
       ) : (
         <Empty
+          illustration={items.length ? undefined : 'balance'}
           title={
             items.length
               ? "Nenhum registro encontrado."
@@ -782,9 +785,7 @@ export function Chat({
             ))
           ) : (
             <div className="chat-welcome">
-              <span className="welcome-mark">
-                <Leaf size={32} />
-              </span>
+              <Artwork name="conversation" className="conversation-art" sizes="(max-width: 700px) 104px, 132px"/>
               <h2>Comece com o que está aí.</h2>
               <p>
                 Um compromisso, uma pendência, uma ideia.

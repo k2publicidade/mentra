@@ -109,7 +109,10 @@ test('interface pública carregada sem erros e responsiva',async({page})=>{
   await page.goto('/'); await expect(page.getByText(/MENTRA/i).first()).toBeVisible();
   await expect(page.locator('input[type="email"]')).toBeVisible();
   await expect(page.locator('input[type="password"]')).toBeVisible();
+  await expect.poll(()=>page.locator('.auth-art img').evaluate(img=>img.complete && img.naturalWidth > 0)).toBeTruthy();
+  await page.screenshot({path:'test-results/artwork-auth-desktop.png',fullPage:true,animations:'disabled'});
   await page.setViewportSize({width:390,height:844});
   expect(await page.evaluate(()=>document.documentElement.scrollWidth <= window.innerWidth)).toBeTruthy();
+  await page.screenshot({path:'test-results/artwork-auth-mobile.png',fullPage:true,animations:'disabled'});
   expect(errors).toEqual([]);
 });
