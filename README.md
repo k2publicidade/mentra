@@ -6,6 +6,12 @@ Webapp PT-BR baseado no núcleo inicial de Mentra_Life_Mapa_de_Implementacao.pdf
 
 O backend online de Vercel usa Supabase Auth e PostgreSQL transacional sem migrar nem tocar no SQLite local. Aplicação publicada em https://mentra-tawny.vercel.app. Veja [ONLINE_DEPLOYMENT.md](ONLINE_DEPLOYMENT.md) para configuração e [VERIFICATION.md](VERIFICATION.md) para evidências e pendências. A confirmação de e-mail está temporariamente desativada por solicitação do responsável.
 
+## Experiência móvel e organização
+
+Navegação inferior, atalhos de criação por tipo e formulário em painel inferior com ações fixas no celular. Hoje separa a agenda por dia, pendências anteriores, prioridades e registros sem data; datas seguem o fuso da conta. Vida oferece busca sem acentos, filtros combinados e ordenação por data, título ou criação. Filtros e rascunho da conversa permanecem durante a navegação da sessão; sair da conta os limpa.
+
+Em Eu, use **Adicionar à tela inicial** para instalar a versão web como app. O manifesto inclui atalhos para a conversa e os registros. A instalação não oferece gravação offline nem notificações push: o service worker guarda somente uma página pública de orientação quando não há conexão, e nunca armazena respostas de API ou dados da conta. Ações continuam dependendo da confirmação do servidor.
+
 ## Rodar localmente
 
 Requisitos: Node.js 24 ou superior e npm.

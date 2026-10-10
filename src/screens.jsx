@@ -24,6 +24,8 @@ import {
 import { VoiceRecorder } from "./VoiceRecorder.jsx";
 import { mergeTranscript } from "./voice.js";
 import { TYPES, formatDate, toDateTimeInput, zonedInputToISO } from "./lib.js";
+import { agendaFor, dayKey, shiftDay, searchItems } from './ux.js';
+import { InstallApp } from './InstallApp.jsx';
 
 export const typeIcons = {
   task: ListTodo,
@@ -389,6 +391,7 @@ export function ItemRow({ item, user, onAction, onEdit, busy }) {
           {item.status === "completed" && (
             <span className="tag">Concluído</span>
           )}
+          {item.status === 'pending' && item.type !== 'memory' && item.dueAt && dayKey(item.dueAt,user.timezone) < dayKey(Date.now(),user.timezone) && <span className="tag overdue-tag">Para revisar</span>}
         </div>
         {item.notes && <p className="item-notes">{item.notes}</p>}
         {item.type === "memory" && (
@@ -433,9 +436,12 @@ export function ItemRow({ item, user, onAction, onEdit, busy }) {
 }
 export function Today(props) {
   const { user, items, summary, onEdit, onNavigate } = props;
-  const dated = items
-    .filter((i) => i.status === "pending" && i.dueAt && i.type !== "memory")
-    .sort((a, b) => a.dueAt.localeCompare(b.dueAt));
+  const today = dayKey(Date.now(), user.timezone);
+  const [selectedDay, setSelectedDay] = useState(today);
+  const [showUndated, setShowUndated] = useState(false);
+  const agenda = agendaFor(items, selectedDay, user.timezone);
+  const completed = items.filter(i => i.type !== 'memory' && i.status === 'completed' && i.dueAt && dayKey(i.dueAt, user.timezone) === today).length;
+  const todayCount = agendaFor(items, today, user.timezone).scheduled.length + completed;
   const priorities = items
     .filter((i) => i.status === "pending" && i.priority)
     .slice(0, 3);
@@ -460,6 +466,14 @@ export function Today(props) {
             <Plus size={18} /> Novo registro
           </button>
         </header>
+        <div className="day-overview" aria-label="Panorama dos registros">
+          <div><span>Hoje</span><strong>{agendaFor(items, today, user.timezone).scheduled.length}</strong><small>com data para hoje</small></div>
+          <div className={agenda.overdue.length ? 'attention' : ''}><span>Para revisar</span><strong>{agenda.overdue.length}</strong><small>dias anteriores</small></div>
+          <div><span>Seu progresso</span><strong>{completed}<em> / {todayCount}</em></strong><small>registros de hoje concluídos</small></div>
+        </div>
+        <div className="quick-capture" aria-label="Criar por tipo">
+          {Object.entries(TYPES).map(([type,label]) => { const Icon = typeIcons[type]; return <button key={type} onClick={() => onEdit({type})}><Icon size={19}/><span>{label}</span><Plus size={14}/></button>; })}
+        </div>
         <button className="capture-strip" onClick={() => onNavigate("mentra")}>
           <span className="capture-circle">
             <MessageCircle size={22} />
@@ -491,23 +505,40 @@ export function Today(props) {
         </section>
         <section className="section-block">
           <div className="section-heading">
-            <h2>No seu caminho</h2>
+            <h2>Sua agenda</h2>
             <button className="text-button" onClick={() => onNavigate("vida")}>
               Ver tudo <ChevronRight size={16} />
             </button>
           </div>
-          {dated.length ? (
+          <div className="agenda-controls">
+            <button className="icon-button" aria-label="Dia anterior" onClick={() => setSelectedDay(shiftDay(selectedDay, -1))}>‹</button>
+            <label><span className="sr-only">Dia da agenda</span><input type="date" value={selectedDay} onChange={e => { if(e.target.value) setSelectedDay(e.target.value); }} /></label>
+            <button className="icon-button" aria-label="Próximo dia" onClick={() => setSelectedDay(shiftDay(selectedDay, 1))}>›</button>
+            <button className="text-button" onClick={() => setSelectedDay(today)}>Hoje</button>
+          </div>
+          <div className="week-strip" aria-label="Dias da semana">
+            {Array.from({length:7}, (_,offset) => shiftDay(today, offset)).map(day => {
+              const when = new Date(`${day}T12:00:00Z`);
+              const count = agendaFor(items, day, user.timezone).scheduled.length;
+              return <button key={day} aria-pressed={day === selectedDay} aria-label={`${when.toLocaleDateString('pt-BR', {timeZone:'UTC',weekday:'long',day:'numeric',month:'long'})}, ${count} registros`} onClick={() => setSelectedDay(day)}><small>{when.toLocaleDateString('pt-BR',{timeZone:'UTC',weekday:'short'}).replace('.','')}</small><strong>{when.getUTCDate()}</strong><span className={count ? 'day-dot has-items' : 'day-dot'} /></button>;
+            })}
+          </div>
+          <p className="agenda-caption">{selectedDay === today ? 'Hoje' : new Date(`${selectedDay}T12:00:00Z`).toLocaleDateString('pt-BR',{timeZone:'UTC',day:'numeric',month:'long'})} · {agenda.scheduled.length} pendentes</p>
+          {agenda.scheduled.length ? (
             <div className="item-list">
-              {dated.slice(0, 8).map((item) => (
+              {agenda.scheduled.map((item) => (
                 <ItemRow key={item.id} {...props} item={item} />
               ))}
             </div>
           ) : (
-            <Empty title="Sua agenda está em aberto.">
-              Compromissos e lembretes com data aparecerão aqui.
+            <Empty title="Um dia com espaço livre.">
+              Nenhum registro pendente nesta data.
+              <button className="text-button" onClick={() => onEdit({type:'event',dueAt:zonedInputToISO(`${selectedDay}T09:00`,user.timezone)})}>Adicionar compromisso <Plus size={16}/></button>
             </Empty>
           )}
         </section>
+        {agenda.overdue.length > 0 && <section className="section-block overdue-section"><div className="section-heading"><h2>Vale revisar</h2><span className="tag">{agenda.overdue.length} de dias anteriores</span></div><p className="muted section-description">Conclua o que já fez ou abra o registro para escolher uma nova data.</p><div className="item-list">{agenda.overdue.map(item => <ItemRow key={item.id} {...props} item={item}/>)}</div></section>}
+        <section className="section-block"><button className="undated-toggle" aria-expanded={showUndated} onClick={() => setShowUndated(!showUndated)}><ListTodo size={20}/><strong>Sem data, no seu ritmo</strong><span>{agenda.undated.length}</span><ChevronRight size={18} className={showUndated ? 'turned' : ''}/></button>{showUndated && (agenda.undated.length ? <div className="item-list">{agenda.undated.map(item => <ItemRow key={item.id} {...props} item={item}/>)}</div> : <Empty title="Nenhuma pendência sem data.">Adicione uma tarefa quando precisar.</Empty>)}</section>
       </section>
       <aside className="today-aside">
         <div className="summary-panel">
@@ -555,18 +586,14 @@ export function Today(props) {
   );
 }
 export function Life(props) {
-  const { items, onEdit } = props;
-  const [q, setQ] = useState("");
-  const [type, setType] = useState("");
-  const [status, setStatus] = useState("");
-  const visible = items.filter(
-    (i) =>
-      (!type || i.type === type) &&
-      (!status || i.status === status) &&
-      `${i.title} ${i.notes} ${i.source}`
-        .toLocaleLowerCase("pt-BR")
-        .includes(q.toLocaleLowerCase("pt-BR")),
-  );
+  const { items, onEdit, user } = props;
+  const [localFilters, setLocalFilters] = useState({q:'', type:'', status:'',focus:'',sort:'recent'});
+  const filters = props.filters || localFilters;
+  const {q,type,status,focus,sort} = filters;
+  const change = patch => (props.onFilters || setLocalFilters)(current => ({...current,...patch}));
+  const setQ = q => change({q}), setType = type => change({type}), setStatus = status => change({status});
+  const reset = () => change({q:'',type:'',status:'',focus:'',sort:'recent'});
+  const visible = searchItems(items, filters, user.timezone);
   return (
     <section>
       <header className="page-heading">
@@ -609,6 +636,9 @@ export function Life(props) {
           </select>
         </label>
       </div>
+      <div className="focus-filters" aria-label="Atalhos de organização">
+        {[["", "Todos"], ["priority", "Prioridades"], ["overdue", "Para revisar"], ["undated", "Sem data"]].map(([value,label]) => <button key={value} aria-pressed={focus === value} onClick={() => change({focus:value})}>{label}</button>)}
+      </div>
       <div className="filter-tabs" aria-label="Filtrar por tipo">
         {[["", "Tudo"], ...Object.entries(TYPES)].map(([value, label]) => {
           const Icon = typeIcons[value];
@@ -627,7 +657,8 @@ export function Life(props) {
         <span>
           {visible.length} {visible.length === 1 ? "registro" : "registros"}
         </span>
-        <small>Seu histórico, sob seu controle.</small>
+        <label className="sort-control"><span>Ordenar</span><select aria-label="Ordenar registros" value={sort} onChange={e => change({sort:e.target.value})}><option value="recent">Mais recentes</option><option value="date">Data mais próxima</option><option value="title">Título A–Z</option></select></label>
+        {(q || type || status || focus) && <button className="text-button" onClick={reset}>Limpar filtros</button>}
       </div>
       {visible.length ? (
         <div className="item-list life-list">
@@ -647,6 +678,7 @@ export function Life(props) {
             ? "Tente outra busca ou outro filtro."
             : "Adicione um registro ou converse com a Mentra para começar."}
           <br />
+          {items.length ? <button className="ghost" onClick={reset}>Limpar busca e filtros</button> : <button className="primary" onClick={() => onEdit(null)}><Plus size={18}/>Criar primeiro registro</button>}
         </Empty>
       )}
     </section>
@@ -659,8 +691,13 @@ export function Chat({
   onChat,
   busy,
   onNavigate,
+  draftText,
+  onDraft,
 }) {
-  const [text, setText] = useState("");
+  const [localText, setLocalText] = useState("");
+  const text = draftText ?? localText;
+  const setText = onDraft || setLocalText;
+  const [voiceOpen, setVoiceOpen] = useState(false);
   const [voiceLocked, setVoiceLocked] = useState(false);
   const voiceLock = useRef(false);
   const draft = useRef(text);
@@ -704,18 +741,18 @@ export function Chat({
           <span className="status-dot" />
           {integrations?.ai === "configured"
             ? "IA configurada no servidor"
-            : "Modo local"}
+            : "Interpretação em português"}
         </span>
       </header>
       <div className="conversation-panel">
-        <div className="chat-disclosure">
+        <details className="chat-disclosure"><summary><ShieldCheck size={16}/> Como a Mentra organiza suas mensagens</summary>
           <ShieldCheck size={16} />
           <span>
             {integrations?.ai === "configured"
               ? "Um provedor de IA está configurado. Solicitações podem usar processamento externo."
               : "Interpretação local em português para mensagens. A transcrição de áudio opcional usa processamento externo, com sua autorização. Se faltar um detalhe, vamos perguntar."}
           </span>
-        </div>
+        </details>
         <div
           className="messages"
           role="log"
@@ -822,7 +859,8 @@ export function Chat({
               </button>
             </div>
           </form>
-          <VoiceRecorder busy={busy} onTranscript={receiveTranscript} onLockedChange={(locked) => { voiceLock.current = locked; setVoiceLocked(locked); }} />
+          <button type="button" className="voice-toggle text-button" aria-expanded={voiceOpen} disabled={voiceLocked} onClick={() => setVoiceOpen(!voiceOpen)}><MessageCircle size={16}/>{voiceOpen ? 'Fechar opções de áudio' : 'Usar áudio'}</button>
+          {voiceOpen && <VoiceRecorder busy={busy} onTranscript={receiveTranscript} onLockedChange={(locked) => { voiceLock.current = locked; setVoiceLocked(locked); }} />}
           <div className="composer-note">
             <span>Revise o texto antes de enviar.</span>
             <span>Enter envia · Shift + Enter quebra linha</span>
@@ -958,6 +996,7 @@ export function Account({
           </section>
         </div>
         <div>
+          <InstallApp />
           <section className="plan-panel">
             <div className="settings-heading">
               <h2>Seu plano</h2>
@@ -1082,6 +1121,11 @@ export function Account({
 }
 export function ItemEditor({ item, user, busy, onClose, onSubmit, serverError }) {
   const dialog = useRef(null);
+  const dirty = useRef(false);
+  const close = () => {
+    if (busy) return;
+    if (!dirty.current || window.confirm('Descartar as alterações deste registro?')) onClose();
+  };
   const opener = useRef(
     typeof document !== "undefined" ? document.activeElement : null,
   );
@@ -1098,7 +1142,7 @@ export function ItemEditor({ item, user, busy, onClose, onSubmit, serverError })
     };
   }, []);
   const keyboard = (e) => {
-    if (e.key === "Escape" && !busy) onClose();
+    if (e.key === "Escape" && !busy) close();
     if (e.key === "Tab") {
       const focusables = [
         ...dialog.current.querySelectorAll(
@@ -1139,7 +1183,7 @@ export function ItemEditor({ item, user, busy, onClose, onSubmit, serverError })
     <div
       className="modal-backdrop"
       onMouseDown={(e) => {
-        if (e.target === e.currentTarget && !busy) onClose();
+        if (e.target === e.currentTarget && !busy) close();
       }}
     >
       <section
@@ -1161,12 +1205,12 @@ export function ItemEditor({ item, user, busy, onClose, onSubmit, serverError })
             className="icon-button"
             aria-label="Fechar formulário"
             disabled={busy}
-            onClick={onClose}
+            onClick={close}
           >
             <X size={22} />
           </button>
         </div>
-        <form onSubmit={submit}>
+        <form onSubmit={submit} onChange={() => { dirty.current = true; }}>
           <Field label="Tipo">
             <select
               value={type}
@@ -1222,6 +1266,10 @@ export function ItemEditor({ item, user, busy, onClose, onSubmit, serverError })
                   onChange={(e) => setDate(e.target.value)}
                 />
               </Field>
+              <div className="date-shortcuts" aria-label="Atalhos de data">
+                {[[0,'Hoje'],[1,'Amanhã'],[7,'Em uma semana']].map(([offset,label]) => <button className="ghost" type="button" key={label} onClick={() => { dirty.current = true; setDate(`${shiftDay(dayKey(Date.now(),user.timezone),offset)}T${date.slice(11) || '09:00'}`); }}>{label}</button>)}
+                <button type="button" className="text-button" onClick={() => { dirty.current = true; setDate(''); }}>Sem data</button>
+              </div>
               <label className="checkbox-line">
                 <input
                   type="checkbox"
@@ -1242,7 +1290,7 @@ export function ItemEditor({ item, user, busy, onClose, onSubmit, serverError })
               type="button"
               className="ghost"
               disabled={busy}
-              onClick={onClose}
+              onClick={close}
             >
               Cancelar
             </button>

@@ -1,5 +1,18 @@
 # Verificação executada — MENTRA LIFE
 
+## Experiência de app e organização — 10/10/2026
+
+Revisão das quatro telas com tipografia maior, cartões, navegação inferior, áreas seguras do celular, formulário em painel inferior, ações fixas e adaptação à altura visível do teclado. Hoje oferece agenda por dia/semana, números derivados dos registros, prioridades, revisão de datas anteriores e lista sem data. Vida combina busca sem acentos, filtros e ordenação. Filtros e rascunho permanecem ao trocar de tela, e são limpos ao sair da conta. Histórico do navegador acompanha as abas.
+
+- `npm test`: 93/93 passaram; build de produção passou. Testes de utilitários cobrem fuso da conta, limites de mês/ano, combinação de filtros, ordenação e exclusão de memórias/concluídos das pendências.
+- `npm run test:e2e`: 8/8 passaram; os dois testes de experiência foram repetidos após os ajustes finais e passaram. `npm run test:voice`: 2/2 passaram.
+- Jornada Chromium: criação com atalho de data, persistência real, desfazer, agenda por dia, filtros e rascunho entre abas, voltar do navegador, orientação de instalação, proteção de alterações não salvas, foco preso no modal e conteúdo de fundo inert.
+- Quatro telas verificadas em 320, 390, 768 e 1440 pixels, sem transbordamento horizontal. Screenshots de Hoje, Vida, Mentra, Eu e edição revisadas em `test-results/ux-*.png`.
+- Manifesto standalone, ícones 192/512 e Apple 180, atalhos para Mentra/Vida e orientação de instalação em Eu. Service worker guarda apenas `/offline.html`; navegação sem conexão mostrou a página pública e retomou login quando a rede voltou. Rotas `/api` não são interceptadas nem armazenadas.
+- Voz continua opcional e exige abrir o painel, autorizar microfone/processamento externo e revisar antes de enviar. Os dois testes com microfone sintético e fornecedor local passaram.
+
+Esta rodada verifica web responsiva em Chromium e comportamento de instalação/serviço offline; não equivale a testes em aparelhos físicos iPhone/Android. Sem internet não há gravação de registros; o rascunho é mantido durante a sessão da página, sem persistência após recarga. A transcrição paga real continua dependendo da chave do fornecedor.
+
 ## Verificação online — 10/10/2026
 
 Produção: https://mentra-tawny.vercel.app. Deploy Vercel com segredos de produção e certificado CA oficial do Supabase. Site URL corrigida para a origem HTTPS oficial. Confirmação de e-mail temporariamente desativada por solicitação expressa do usuário; SMTP próprio não configurado.

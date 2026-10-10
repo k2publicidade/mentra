@@ -162,7 +162,7 @@ test("all four product surfaces render real server state and accessible action c
     assert.match(life, /Informado por mim/);
     assert.match(life, /Editar/);
     const chat = renderToStaticMarkup(createElement(Chat, props));
-    assert.match(chat, /Modo local/);
+    assert.match(chat, /Interpretação em português/);
     assert.match(chat, /Enviar/);
     const account = renderToStaticMarkup(createElement(Account, props));
     assert.match(account, /Exportar/);

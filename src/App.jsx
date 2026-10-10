@@ -10,6 +10,7 @@ import {
   Check,
   Undo2,
   AlertCircle,
+  Plus,
 } from "lucide-react";
 import { apiRequest, notificationPlan, createOnboardingFlow } from "./lib.js";
 import {
@@ -32,7 +33,38 @@ const NAV = [
 export default function App() {
   const [boot, setBoot] = useState(true),
     [user, setUser] = useState(null),
-    [tab, setTab] = useState("hoje");
+    [tab, setTab] = useState(() => typeof window !== 'undefined' && NAV.some(n => n.id === window.location.hash.slice(1)) ? window.location.hash.slice(1) : 'hoje');
+  const [lifeFilters, setLifeFilters] = useState({ q: '', type: '', status: '', focus: '', sort: 'recent' });
+  const [chatDraft, setChatDraft] = useState('');
+  const [online, setOnline] = useState(() => typeof navigator === 'undefined' || navigator.onLine);
+  useEffect(() => {
+    const connection = () => setOnline(navigator.onLine);
+    const history = () => {
+      const next = window.location.hash.slice(1);
+      if (NAV.some(n => n.id === next)) setTab(next);
+      else if (!next) setTab('hoje');
+    };
+    window.addEventListener('online', connection);
+    window.addEventListener('offline', connection);
+    window.addEventListener('hashchange', history);
+    return () => { window.removeEventListener('online', connection); window.removeEventListener('offline', connection); window.removeEventListener('hashchange', history); };
+  }, []);
+  useEffect(() => {
+    document.title = `${NAV.find(n => n.id === tab)?.label || 'Mentra'} · Mentra Life`;
+    window.scrollTo({top: 0, behavior: 'instant'});
+  }, [tab]);
+  useEffect(() => {
+    const viewport = window.visualViewport;
+    const resize = () => {
+      document.documentElement.style.setProperty('--app-height', `${viewport?.height || window.innerHeight}px`);
+      document.documentElement.classList.toggle('keyboard-open', !!viewport && viewport.height < window.innerHeight * .78 && /INPUT|TEXTAREA/.test(document.activeElement?.tagName || ''));
+    };
+    resize();
+    viewport?.addEventListener('resize', resize);
+    window.addEventListener('resize', resize);
+    window.addEventListener('focusout', resize);
+    return () => { viewport?.removeEventListener('resize', resize); window.removeEventListener('resize', resize); window.removeEventListener('focusout', resize); document.documentElement.classList.remove('keyboard-open'); };
+  }, []);
   const [data, setData] = useState({
     items: [],
     messages: [],
@@ -63,6 +95,9 @@ export default function App() {
     setEditor(undefined);
     setToast(null);
     setTab("hoje");
+    setChatDraft('');
+    setLifeFilters({ q: '', type: '', status: '', focus: '', sort: 'recent' });
+    window.history.replaceState(null, '', window.location.pathname);
     setNotificationEnabled(false);
     delivered.current.clear();
     request.current = null;
@@ -166,6 +201,7 @@ export default function App() {
   }, [toast]);
   const navigate = useCallback((next) => {
     setTab(next);
+    if (window.location.hash !== `#${next}`) window.location.hash = next;
     setError("");
     setToast(null);
     setTimeout(() => main.current?.focus({ preventScroll: true }), 0);
@@ -386,7 +422,7 @@ export default function App() {
     user,
     ...data,
     busy: busy || loading,
-    onEdit: setEditor,
+    onEdit: item => { setError(''); setEditor(item); },
     onAction: action,
     onChat: chat,
     onSave: saveProfile,
@@ -395,6 +431,10 @@ export default function App() {
     onNavigate: navigate,
     onNotify: notify,
     notificationStatus,
+    filters: lifeFilters,
+    onFilters: setLifeFilters,
+    draftText: chatDraft,
+    onDraft: setChatDraft,
   };
   if (!user.onboarded)
     return (
@@ -408,11 +448,11 @@ export default function App() {
       </>
     );
   return (
-    <div className="app-shell">
+    <div className={`app-shell ${tab === 'mentra' ? 'is-chat' : ''}`}>
       <a className="skip-link" href="#main">
         Pular para o conteúdo
       </a>
-      <aside className="sidebar">
+      <aside className="sidebar" inert={editor !== undefined ? true : undefined}>
         <Brand compact />
         <div className="sidebar-rule" />
         <p className="nav-caption">SEU ESPAÇO</p>
@@ -435,12 +475,12 @@ export default function App() {
             <strong>
               {data.integrations?.ai === "configured"
                 ? "IA configurada"
-                : "Modo local"}
+                : "Organização em português"}
             </strong>
             <p>
               {data.integrations?.ai === "configured"
                 ? "Provedor no servidor"
-                : "Sem IA externa"}
+                : "Interpretação no servidor"}
             </p>
           </div>
           <button className="sidebar-profile" onClick={() => navigate("eu")}>
@@ -452,7 +492,7 @@ export default function App() {
           </button>
         </div>
       </aside>
-      <div className="workspace">
+      <div className="workspace" inert={editor !== undefined ? true : undefined}>
         <header className="topbar">
           <div className="breadcrumb">
             Seu espaço <span>/</span>{" "}
@@ -489,6 +529,7 @@ export default function App() {
           <div className="mobile-brand">
             <Brand compact />
           </div>
+          {!online && <div className="connection-banner" role="status">Sem conexão. Você pode revisar o que já está na tela; conecte-se para atualizar ou salvar.</div>}
           {error && (
             <div className="error-banner" role="alert">
               <AlertCircle size={18} />
@@ -531,6 +572,7 @@ export default function App() {
           <span>Um passo de cada vez.</span>
         </footer>
       </div>
+      {tab !== 'mentra' && <button className="quick-add" aria-label="Adicionar registro" disabled={editor !== undefined || busy} onClick={() => { setError(''); setEditor(null); }}><Plus size={24} /><span>Adicionar</span></button>}
       {editor !== undefined && (
         <ItemEditor
           item={editor}

@@ -139,11 +139,15 @@ test('Chat replaces dictation with external consent and review disclosure withou
     const { Chat } = await server.ssrLoadModule('/src/screens.jsx');
     let saves = 0;
     const html = renderToStaticMarkup(createElement(Chat, { user: { name: 'Ana', timezone: 'America/Sao_Paulo' }, messages: [], integrations: { ai: 'local' }, onChat: () => saves++, onNavigate() {} }));
-    assert.match(html, /Gravar áudio/);
-    assert.match(html, /type="checkbox"/);
+    assert.match(html, /Usar áudio/);
+    assert.match(html, /aria-expanded="false"/);
     assert.match(html, /processamento externo/);
     assert.match(html, /Mensagem para a Mentra/);
-    assert.match(html, /Nada é salvo antes/);
+    const {VoiceRecorder} = await server.ssrLoadModule('/src/VoiceRecorder.jsx');
+    const recorder = renderToStaticMarkup(createElement(VoiceRecorder, {}));
+    assert.match(recorder, /Gravar áudio/);
+    assert.match(recorder, /type="checkbox"/);
+    assert.match(recorder, /Nada é salvo antes/);
     assert.doesNotMatch(html, /Ditar mensagem|Ditado opcional/);
     assert.equal(saves, 0);
   } finally { await server.close(); }

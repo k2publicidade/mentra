@@ -6,6 +6,7 @@ async function openChat(page){
  const r=await page.request.post('/api/auth/register',{data:{name:'Voz Teste',email:`voice-${crypto.randomUUID()}@example.com`,password:crypto.randomBytes(20).toString('hex'),timezone:'America/Sao_Paulo'}});expect(r.status()).toBe(201);
  await page.request.patch('/api/profile',{data:{onboarded:true}});
  await page.goto('/');await page.getByRole('navigation',{name:'Navegação principal'}).getByRole('button',{name:'Mentra',exact:true}).click();
+ await page.getByRole('button',{name:'Usar áudio',exact:true}).click();
  page.on('dialog',d=>d.accept());
 }
 async function record(page){
