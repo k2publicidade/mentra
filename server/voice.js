@@ -8,14 +8,16 @@ export function installVoice(app,options={}){
  const transport=options.transport ?? fetch;
  const rates=new Map(),clock=options.now??Date.now;
  const rateMax=options.rateMax??5,active=new Set(),timeoutMs=options.timeoutMs??45000;
- const raw=express.raw({type:()=>true,limit:10485760,inflate:false});
+ const maxBytes=options.maxBytes??10485760;
+ if(!Number.isSafeInteger(maxBytes)||maxBytes<=0||maxBytes>10485760)throw new Error('Limite de áudio inválido.');
+ const raw=express.raw({type:()=>true,limit:maxBytes,inflate:false});
  const readAudio=(req,res,next)=>raw(req,res,error=>{
   // Aborted/expired uploads must not reach Express's generic error logger.
   if(res.writableEnded||res.destroyed)return;
-  if(error)return res.status(error.status===413?413:400).json({error:error.status===413?'O áudio excede o limite de 10 MB.':'Não foi possível ler o áudio enviado.'});
+  if(error)return res.status(error.status===413?413:400).json({error:error.status===413?`O áudio excede o limite de ${Math.round(maxBytes/1000000)} MB. Grave uma mensagem mais curta.`:'Não foi possível ler o áudio enviado.'});
   next();
  });
- app.get('/api/voice/capabilities',(req,res)=>res.json({configured:Boolean(apiKey),provider,maxBytes:10485760,maxDurationSeconds:120,formats:['audio/webm','audio/mp4','audio/wav','audio/mpeg']}));
+ app.get('/api/voice/capabilities',(req,res)=>res.json({configured:Boolean(apiKey),provider,maxBytes,maxDurationSeconds:120,formats:['audio/webm','audio/mp4','audio/wav','audio/mpeg']}));
  app.post('/api/voice/transcribe',(req,res,next)=>{
   if(!apiKey)return res.status(503).json({error:'Transcrição externa não configurada.'});
   const mime=req.get('content-type')?.split(';')[0].trim().toLowerCase();

@@ -14,7 +14,8 @@ export function createOnlineRuntime(env=process.env){
  const config=onlineConfig(env),auth=createSupabaseAuth(config.auth),pool=new Pool(config.pool);
  // Do not print connection strings or Auth tokens on background pool errors.
  pool.on('error',()=>{});
- const app=createOnlineApp({pool,auth,origin:config.origin,sessionSecret:config.sessionSecret});
+ // Keep browser recordings below Vercel's 4.5 MB function payload limit.
+ const app=createOnlineApp({pool,auth,origin:config.origin,sessionSecret:config.sessionSecret,voiceOptions:{maxBytes:4000000}});
  // Vercel supplies the immediate trusted proxy; never trust arbitrary-length forwarded chains.
  app.set('trust proxy',1);app.locals.pool=pool;return app;
 }

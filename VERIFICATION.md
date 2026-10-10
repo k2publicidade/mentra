@@ -17,6 +17,8 @@ Voz: capabilities remoto retornou `configured: false`, `provider: brainiall`; o 
 
 As seções abaixo são registros históricos e não substituem esta rodada online.
 
+Atualização de compatibilidade da voz na Vercel: backend online e capabilities limitam áudio a 4.000.000 bytes; frontend já respeita capabilities. Testes de rejeição acima do limite antes da chamada ao fornecedor e de upload pequeno passaram. 31 testes relacionados a voz, frontend e configuração Vercel passaram nesta rodada. Chave BRAINIALL ainda necessária para validação paga real.
+
 ## Resultado inicial do núcleo local
 
 As evidências abaixo registram a rodada anterior à implementação de gravação real; a atualização de voz aparece ao final.

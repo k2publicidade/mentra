@@ -64,7 +64,7 @@ try{
  assert.equal((await a('/auth/logout','POST',{})).status,200);assert.equal((await a('/auth/me')).status,401);
  assert.equal((await a('/auth/login','POST',{email:credentials.email,password:credentials.password})).status,200);
  assert.ok((await a('/items')).data.items.length>0);
- const voice=await a('/voice/capabilities');assert.equal(voice.status,200);console.log(`VOICE: configured=${voice.data.configured}, provider=${voice.data.provider}`);
+ const voice=await a('/voice/capabilities');assert.equal(voice.status,200);assert.equal(voice.data.maxBytes,4000000);console.log(`VOICE: configured=${voice.data.configured}, provider=${voice.data.provider}, maxBytes=${voice.data.maxBytes}`);
  console.log('PASS: logout, real provider login, persisted data after a new session');
 }finally{
  const failures=[];

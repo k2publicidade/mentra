@@ -3,6 +3,12 @@ import assert from 'node:assert/strict';
 import http from 'node:http';
 import {createApp} from '../server/app.js';
 const audio=Buffer.from([0x1a,0x45,0xdf,0xa3,1,2,3,4]);
+test('hosting upload limit is advertised and oversized audio never reaches the provider',async t=>{
+ let calls=0;const f=await fixture(t,{apiKey:'test',maxBytes:4000000},async(req,res)=>{calls++;for await(const c of req){}res.end('{"text":"ok"}');});
+ const capabilities=await fetch(f.base+'/api/voice/capabilities',{headers:{cookie:f.cookie}}).then(r=>r.json());assert.equal(capabilities.maxBytes,4000000);
+ const large=Buffer.alloc(4000001);audio.copy(large);const rejected=await f.post(large);assert.equal(rejected.status,413);assert.match((await rejected.json()).error,/4 MB/);assert.equal(calls,0);
+ assert.equal((await f.post()).status,200);assert.equal(calls,1);
+});
 async function fixture(t,voiceOptions={apiKey:''},providerHandler){
  voiceOptions={provider:'openai',...voiceOptions};
  let provider;
