@@ -1,5 +1,13 @@
 # Verificação executada — MENTRA LIFE
 
+## Motion e carregamento — 10/10/2026
+
+Sistema CSS em `src/motion.css`, sem dependências novas: entrada das telas, hierarquia dos cartões, itens e mensagens, abertura do formulário, confirmação de ações, resposta ao toque e hover apenas em ponteiros precisos. Transições principais de 120–260 ms com deslocamentos pequenos; ilustração de entrada usa 420 ms. Navegação não aguarda a animação, e confirmação continua dependendo da resposta real do servidor.
+
+Carregamento inicial mostra esqueletos decorativos; atualização/gravação mostra barra indeterminada com nome acessível, sem porcentagem inventada. Conversa em processamento usa três pontos decorativos junto ao texto de status. `prefers-reduced-motion` desativa animações/transições, remove shimmer e mantém a indicação estática.
+
+Build de produção passou. `npm run test:e2e`: 10/10 passaram em Chromium. Os dois novos testes seguram a resposta de carregamento, verificam o estado indeterminado, navegação rápida, compositor acima da navegação inferior, foco no formulário e ausência de transbordamento; repetem o fluxo com movimento reduzido e confirmam animações/transições desativadas. As jornadas existentes de persistência, erro de gravação, histórico, filtros, imagens e modo offline continuam passando. Esta rodada usa navegador automatizado, sem testes em aparelhos físicos.
+
 ## Coleção de imagens 3D — 10/10/2026
 
 Três ilustrações originais geradas com `image_gen`: equilíbrio/folha, agenda e conversa, em verde sálvia e marfim, acabamento fosco e transparência real. Mestres e prompts em `design/3d`; versões responsivas WebP 320/640 e fallback PNG em `public/artwork`. WebP 320 tem 11,5–14,7 KB por arquivo, e 640 tem 28,8–35,8 KB. Alfa dos três mestres confirmado durante preparação com Sharp.

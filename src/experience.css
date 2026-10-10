@@ -107,7 +107,7 @@ button, input, select, textarea { font: inherit; }
   .page-heading h1, .today-layout .page-heading h1, .chat-screen .page-heading h1 { font-size: 28px; line-height: 1.15; }
   .page-heading .eyebrow { font-size: 10px; letter-spacing: 1px; line-height: 1.6; }
   .page-heading .muted { font-size: 14px; line-height: 1.6; }
-  .today-main .page-heading > .primary, .main-content > section > .page-heading > .primary { display: none; }
+  .today-main .page-heading > .primary, .screen-stage > section > .page-heading > .primary { display: none; }
   .day-overview { gap: 7px; margin-top: 20px; }
   .day-overview > div { padding: 14px 10px; border-radius: 16px; }
   .day-overview span { font-size: 11px; }
@@ -152,6 +152,8 @@ button, input, select, textarea { font: inherit; }
   .is-chat .topbar { flex-shrink: 0; }
   .is-chat .main-content { flex: 1; min-height: 0; padding: 14px 0 0; display: flex; flex-direction: column; overflow: hidden; }
   .chat-screen { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .screen-stage { min-width: 0; }
+  .conversation-stage { flex: 1; min-height: 0; display: flex; flex-direction: column; }
   .chat-screen .page-heading { padding: 0 18px; margin: 0 0 14px; flex-shrink: 0; }
   .chat-screen .page-heading h1 { font-size: 23px; }
   .chat-screen .page-heading .eyebrow, .chat-screen .page-heading .muted, .chat-screen .mode-badge { display: none; }
@@ -183,9 +185,4 @@ button, input, select, textarea { font: inherit; }
   .keyboard-open .sidebar, .keyboard-open .quick-add { display: none; }
   .keyboard-open .is-chat .workspace { padding-bottom: 0; }
   .keyboard-open .chat-screen .page-heading { display: none; }
-}
-@media (prefers-reduced-motion: no-preference) {
-  .quick-add, .week-strip button, .main-nav button { transition: background .15s ease, box-shadow .15s ease; }
-  .modal { animation: sheet-enter .18s ease-out; }
-  @keyframes sheet-enter { from { transform: translateY(20px); opacity: .5; } to { transform: translateY(0); opacity: 1; } }
 }

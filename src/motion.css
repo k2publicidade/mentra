@@ -1,0 +1,86 @@
+/* Motion communicates hierarchy and state; it never controls saving or routing. */
+:root {
+  --motion-fast: 120ms;
+  --motion-ui: 180ms;
+  --motion-screen: 260ms;
+  --ease-out: cubic-bezier(.22, 1, .36, 1);
+  --ease-ui: cubic-bezier(.2, .65, .3, 1);
+}
+.screen-stage { min-width: 0; }
+.topbar { position: relative; }
+.sync-progress { position: absolute; inset: auto 0 0; height: 2px; overflow: hidden; pointer-events: none; background: #dfe8d8; }
+.sync-progress > span { display: block; height: 100%; width: 40%; background: #51735b; border-radius: 2px; }
+.loading-skeleton { width: min(100%, 420px); margin: 24px auto 0; display: grid; gap: 12px; }
+.loading-skeleton > span { display: block; height: 56px; border-radius: 14px; background: #e8ede3; position: relative; overflow: hidden; }
+.loading-skeleton > span:nth-child(2) { width: 88%; }
+.loading-skeleton > span:nth-child(3) { width: 72%; }
+.loading-skeleton > span::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg,transparent,#fffefa80,transparent); }
+.processing { display: flex; gap: 10px; align-items: center; }
+.processing-dots { display: inline-flex; gap: 4px; flex-shrink: 0; }
+.processing-dots i { width: 4px; height: 4px; background: currentColor; border-radius: 50%; opacity: .55; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .screen-stage { animation: screen-arrive var(--motion-screen) var(--ease-out) both; }
+  .auth-form, .onboard-card { animation: screen-arrive var(--motion-screen) var(--ease-out) both; }
+  .auth-art { animation: artwork-arrive 420ms var(--ease-out) both; }
+  .page-heading, .day-overview, .quick-capture, .capture-strip, .section-block, .today-aside, .settings-panel, .plan-panel {
+    animation: content-arrive var(--motion-screen) var(--ease-out) both;
+  }
+  .day-overview, .account-grid > div > :nth-child(2) { animation-delay: 25ms; }
+  .quick-capture, .account-grid > div > :nth-child(3) { animation-delay: 45ms; }
+  .capture-strip, .today-aside { animation-delay: 65ms; }
+  .section-block { animation-delay: 80ms; }
+  .item-row { animation: row-arrive var(--motion-ui) var(--ease-out) both; }
+  .item-row:nth-child(2) { animation-delay: 20ms; }
+  .item-row:nth-child(3) { animation-delay: 35ms; }
+  .item-row:nth-child(4) { animation-delay: 50ms; }
+  .item-row:nth-child(5) { animation-delay: 65ms; }
+  .item-row:nth-child(6) { animation-delay: 80ms; }
+  .message { animation: row-arrive var(--motion-ui) var(--ease-out) both; }
+  .modal-backdrop { animation: backdrop-arrive var(--motion-ui) ease-out both; }
+  .modal { animation: dialog-arrive 220ms var(--ease-out) both; }
+  .toast { animation: notice-arrive 220ms var(--ease-out) both; }
+  .error-banner, .connection-banner { animation: content-arrive var(--motion-ui) var(--ease-out) both; }
+  .toast > svg:first-child { animation: confirmation-arrive 220ms var(--ease-out) both; }
+  .primary, .ghost, .danger-button, .quick-add, .icon-button, .complete-button, .send-button, .quick-capture button, .capture-strip, .suggestions button, .filter-tabs button, .focus-filters button, .week-strip button, .main-nav button, .undated-toggle {
+    transition: transform var(--motion-fast) var(--ease-ui), background-color var(--motion-ui) var(--ease-ui), color var(--motion-ui) var(--ease-ui), border-color var(--motion-ui) var(--ease-ui), box-shadow var(--motion-ui) var(--ease-ui);
+  }
+  .main-nav button > svg { transition: transform var(--motion-ui) var(--ease-out); }
+  .main-nav button[aria-current=page] > svg { transform: translateY(-1px); }
+  .primary:active:not(:disabled), .ghost:active:not(:disabled), .quick-add:active:not(:disabled), .send-button:active:not(:disabled), .quick-capture button:active, .week-strip button:active, .main-nav button:active { transform: scale(.98); }
+  .icon-button:active:not(:disabled), .complete-button:active:not(:disabled) { transform: scale(.94); }
+  .item-row { transition: background-color var(--motion-ui) var(--ease-ui); }
+  .item-title, .item-meta, .complete-button { transition: color var(--motion-ui) var(--ease-ui), opacity var(--motion-ui) var(--ease-ui); }
+  .completed .complete-button > svg, .is-priority > svg { animation: confirmation-arrive 220ms var(--ease-out) both; }
+  input, textarea, select { transition: border-color var(--motion-fast) var(--ease-ui), background-color var(--motion-fast) var(--ease-ui); }
+  .sync-progress > span { animation: sync-travel 1400ms var(--ease-ui) infinite; }
+  .loading-skeleton > span::after { animation: skeleton-travel 1400ms ease-in-out infinite; }
+  .loading-skeleton > span:nth-child(2)::after { animation-delay: 80ms; }
+  .loading-skeleton > span:nth-child(3)::after { animation-delay: 160ms; }
+  .processing-dots i { animation: processing-pulse 1000ms ease-in-out infinite; }
+  .processing-dots i:nth-child(2) { animation-delay: 120ms; }
+  .processing-dots i:nth-child(3) { animation-delay: 240ms; }
+  .boot .brand-mark { animation: boot-breathe 1800ms ease-in-out infinite; }
+  @media (hover: hover) and (pointer: fine) {
+    .primary:hover:not(:disabled), .quick-add:hover:not(:disabled), .send-button:hover:not(:disabled) { transform: translateY(-1px); box-shadow: 0 6px 16px #244b3b20; }
+    .quick-capture button:hover, .capture-strip:hover { transform: translateY(-1px); }
+    .item-row:hover { background-color: #f6f8f0; }
+  }
+}
+@keyframes screen-arrive { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes content-arrive { from { opacity: .4; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes row-arrive { from { opacity: .45; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes artwork-arrive { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes backdrop-arrive { from { background-color: #19352700; } to { background-color: #19352770; } }
+@keyframes dialog-arrive { from { opacity: .5; transform: translateY(14px) scale(.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes notice-arrive { from { opacity: 0; translate: 0 8px; } to { opacity: 1; translate: 0 0; } }
+@keyframes confirmation-arrive { from { opacity: .5; scale: .85; } to { opacity: 1; scale: 1; } }
+@keyframes sync-travel { from { transform: translateX(-110%); } to { transform: translateX(360%); } }
+@keyframes skeleton-travel { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+@keyframes processing-pulse { 0%, 80%, 100% { opacity: .4; transform: translateY(0); } 40% { opacity: 1; transform: translateY(-2px); } }
+@keyframes boot-breathe { 0%, 100% { opacity: .7; } 50% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .loading-skeleton > span::after { display: none; }
+  .sync-progress > span { width: 100%; }
+}
+@media (max-width: 700px) { .topbar { position: sticky; } }

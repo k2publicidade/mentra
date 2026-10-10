@@ -494,6 +494,7 @@ export default function App() {
       </aside>
       <div className="workspace" inert={editor !== undefined ? true : undefined}>
         <header className="topbar">
+          {(busy || loading) && <div className="sync-progress" role="progressbar" aria-label={loading ? 'Atualizando registros' : 'Processando ação'}><span/></div>}
           <div className="breadcrumb">
             Seu espaço <span>/</span>{" "}
             <strong>{NAV.find((n) => n.id === tab)?.label}</strong>
@@ -501,7 +502,7 @@ export default function App() {
           <div className="topbar-actions">
             <span className="topbar-note">
               <span className="status-dot" />{" "}
-              {loading ? "Atualizando…" : "No seu ritmo"}
+              {loading ? "Atualizando…" : busy ? "Processando…" : "No seu ritmo"}
             </span>
             <button
               className="icon-button"
@@ -552,10 +553,12 @@ export default function App() {
               </button>
             </div>
           )}
+          <div key={tab} className={`screen-stage ${tab === 'mentra' ? 'conversation-stage' : ''}`}>
           {loading && !data.summary ? (
             <div className="loading-panel" role="status">
               <Leaf size={28} />
               <p>Buscando seus registros…</p>
+              <div className="loading-skeleton" aria-hidden="true"><span/><span/><span/></div>
             </div>
           ) : tab === "hoje" ? (
             <Today {...common} />
@@ -566,6 +569,7 @@ export default function App() {
           ) : (
             <Account key={user.id} {...common} />
           )}
+          </div>
         </main>
         <footer className="workspace-footer">
           <span>MENTRA LIFE</span>
@@ -584,7 +588,7 @@ export default function App() {
         />
       )}{" "}
       {toast && (
-        <div className="toast" role="status">
+        <div key={toast.undoId || toast.text} className="toast" role="status">
           <Check size={18} />
           <span>{toast.text}</span>
           {toast.undoId && (

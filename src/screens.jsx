@@ -806,6 +806,7 @@ export function Chat({
           )}
           {busy && (
             <p className="processing" role="status">
+              <span className="processing-dots" aria-hidden="true"><i/><i/><i/></span>
               Mentra está processando seu pedido…
             </p>
           )}

@@ -14,6 +14,8 @@ Em Eu, use **Adicionar à tela inicial** para instalar a versão web como app. O
 
 A coleção de ilustrações 3D usa fundo transparente, cores da identidade e WebP responsivo. Mestres, prompts e detalhes de preparação estão em [design/3d/README.md](design/3d/README.md).
 
+Entradas e interações usam movimentos discretos de 120–260 ms, com transições entre telas, formulários e confirmações. Carregamento exibe progresso indeterminado e esqueletos; processamento da conversa recebe um indicador próprio. A preferência de movimento reduzido desativa animações e mantém os estados visíveis, sem atrasar navegação ou gravação.
+
 ## Rodar localmente
 
 Requisitos: Node.js 24 ou superior e npm.
