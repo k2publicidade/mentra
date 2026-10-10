@@ -1,0 +1,12 @@
+import {resolve} from 'node:path';
+import {existsSync} from 'node:fs';
+const cert=process.env.TLS_CERT_PATH||resolve('data/tls/server.crt');
+const key=process.env.TLS_KEY_PATH||resolve('data/tls/server.key');
+if(!existsSync(cert)||!existsSync(key))throw new Error('Certificados locais ausentes. Consulte VOICE_SETUP.md antes de iniciar no celular.');
+process.env.TLS_CERT_PATH=cert;
+process.env.TLS_KEY_PATH=key;
+process.env.HOST=process.env.MOBILE_HOST||'0.0.0.0';
+process.env.PORT=process.env.MOBILE_PORT??'3443';
+process.env.NODE_ENV='production';
+console.log('HTTPS para teste na rede local. Confie na CA somente nos seus dispositivos de teste; nunca compartilhe arquivos .key.');
+await import('../server/index.js');

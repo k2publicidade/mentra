@@ -1,0 +1,20 @@
+node_modules/
+dist/
+data/
+.env
+.env.*
+!.env.example
+test-results/
+playwright-report/
+*.log
+# Source product document is not part of the public code delivery.
+*.pdf
+# Defense in depth: never publish credentials, certificates or databases.
+*.key
+*.pem
+*.p12
+*.pfx
+*.crt
+*.sqlite
+*.sqlite-*
+*.db

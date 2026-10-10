@@ -1,0 +1,2 @@
+import {defineConfig} from '@playwright/test';
+export default defineConfig({testDir:'./e2e',testMatch:'voice.acceptance.js',workers:1,fullyParallel:false,use:{baseURL:'http://127.0.0.1:3110',headless:true,permissions:['microphone'],launchOptions:{args:['--use-fake-device-for-media-stream','--use-fake-ui-for-media-stream']},trace:'retain-on-failure'},webServer:{command:'node e2e/voice-server.js',url:'http://127.0.0.1:3110/api/health',reuseExistingServer:false,timeout:30000,env:{NODE_ENV:'test',BRAINIALL_API_KEY:'',OPENAI_API_KEY:''}}});
