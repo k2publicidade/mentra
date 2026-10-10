@@ -2,6 +2,10 @@
 
 Webapp PT-BR baseado no núcleo inicial de Mentra_Life_Mapa_de_Implementacao.pdf. Este repositório não substitui o PRD Técnico Mestre citado no PDF, nem aprova publicação comercial.
 
+## Publicação online
+
+O backend online de Vercel usa Supabase Auth e PostgreSQL transacional sem migrar nem tocar no SQLite local. Veja [ONLINE_DEPLOYMENT.md](ONLINE_DEPLOYMENT.md) para ordem das migrações, variáveis exclusivamente do servidor, confirmação de e-mail e verificações remotas ainda necessárias. A publicação não foi executada por esta implementação.
+
 ## Rodar localmente
 
 Requisitos: Node.js 24 ou superior e npm.

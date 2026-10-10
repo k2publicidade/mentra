@@ -200,6 +200,7 @@ export default function App() {
     const result = await operate(() =>
       apiRequest(`/auth/${mode}`, { method: "POST", body: values }),
     );
+    if (result?.confirmationRequired) return result;
     if (result) {
       generation.current++;
       setUser(result.user);

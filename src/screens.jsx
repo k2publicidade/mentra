@@ -109,17 +109,23 @@ export function TimezoneField({ value, onChange }) {
 }
 export function Auth({ onSubmit, busy, error, initialRegister = false }) {
   const [register, setRegister] = useState(initialRegister);
+  const [notice, setNotice] = useState("");
   const [timezone, setTimezone] = useState(
     () =>
       Intl.DateTimeFormat().resolvedOptions().timeZone || "America/Sao_Paulo",
   );
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
+    setNotice("");
     const values = Object.fromEntries(new FormData(e.currentTarget));
-    onSubmit(register ? "register" : "login", {
+    const result = await onSubmit(register ? "register" : "login", {
       ...values,
       ...(register ? { timezone } : {}),
     });
+    if (result?.confirmationRequired) {
+      setRegister(false);
+      setNotice(result.message || "Confira seu e-mail para confirmar o cadastro. Depois entre na sua conta.");
+    }
   };
   return (
     <main className="auth-page">
@@ -209,6 +215,7 @@ export function Auth({ onSubmit, busy, error, initialRegister = false }) {
             {register && (
               <TimezoneField value={timezone} onChange={setTimezone} />
             )}{" "}
+            {notice && <p role="status">{notice}</p>}
             {error && (
               <p className="form-error" role="alert">
                 {error}
