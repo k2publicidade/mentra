@@ -1,5 +1,22 @@
 # Verificação executada — MENTRA LIFE
 
+## Verificação online — 10/10/2026
+
+Produção: https://mentra-tawny.vercel.app. Deploy Vercel com segredos de produção e certificado CA oficial do Supabase. Site URL corrigida para a origem HTTPS oficial. Confirmação de e-mail temporariamente desativada por solicitação expressa do usuário; SMTP próprio não configurado.
+
+- `npm test`: 89/89 passaram; quatro falhas de diretório temporário no Windows corrigidas com `node:os.tmpdir()`.
+- `npm run build`: passou.
+- `npm run test:e2e`: 6/6 passaram em Chromium local.
+- `npx playwright test --config playwright.online.config.js`: 1/1 passou com fixture de confirmação de e-mail.
+- PostgreSQL remoto: TLS com validação de certificado passou; seis tabelas/RLS, políticas, triggers, prioridade CHECK/UNIQUE e permissões das funções verificadas. A definição da migração de timestamps já estava aplicada.
+- `/api/health` público: HTTP 200, `{ "ok": true, "storage": "supabase" }`. Rotas protegidas sem sessão retornaram HTTP 401 JSON.
+- `node scripts/verify-online.js --allow-test-accounts`: passou no deploy real, com Supabase Auth e PostgreSQL reais. Duas contas de teste únicas foram removidas pelo endpoint de exclusão de conta ao final.
+- Fluxos remotos: cadastro imediato, cookie Secure/HttpOnly sem tokens no JSON, quatro tipos de itens, edição, desfazer encadeado, isolamento entre contas, chat/esclarecimento/correção/desfazer, concorrência de replay idempotente, três prioridades sob quatro gravações concorrentes, merge de preferências concorrentes, resumo, exportação JSON, ICS, data inválida rejeitada, logout, login real e persistência após nova sessão.
+
+Voz: capabilities remoto retornou `configured: false`, `provider: brainiall`; o usuário informou que adicionará BRAINIALL_API_KEY. A chamada paga real e a validação em aparelhos dependem dessa configuração. Entrega de e-mail não foi testada, pois confirmação está desativada. Recuperação de senha, IA generativa, WhatsApp, cobrança e notificações de servidor continuam fora da implementação atual.
+
+As seções abaixo são registros históricos e não substituem esta rodada online.
+
 ## Resultado inicial do núcleo local
 
 As evidências abaixo registram a rodada anterior à implementação de gravação real; a atualização de voz aparece ao final.

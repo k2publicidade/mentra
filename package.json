@@ -11,7 +11,8 @@
     "start:mobile": "node --env-file-if-exists=.env scripts/start-mobile.js",
     "test": "node --test tests/*.test.js",
     "test:e2e": "playwright test",
-    "test:voice": "playwright test --config playwright.voice.config.js"
+    "test:voice": "playwright test --config playwright.voice.config.js",
+    "verify:online": "node scripts/verify-online.js"
   },
   "dependencies": {
     "express": "^5.1.0",

@@ -4,7 +4,7 @@ Projeto solicitado: mmhvbjmetsuscnyzsvxg.
 
 ## Estado real
 
-A migração foi preparada localmente. Não foi aplicada ao projeto online: a sessão de automação ainda exige autenticação. O backend em server/app.js continua usando SQLite e autenticação própria. Criar essas tabelas NÃO conecta o app ao Supabase, não transfere os usuários locais e não ativa integrações, pagamentos ou notificações externas.
+Em 10/10/2026, o banco online foi verificado diretamente por PostgreSQL com TLS e CA oficial: seis tabelas com RLS, políticas de proprietário, triggers, limite de prioridades e permissões das funções conferidos. As duas migrações já estão aplicadas; não reaplicar a migração inicial. A Vercel usa server/online-app.js com Supabase Auth e PostgreSQL. server/app.js continua sendo o modo SQLite local, sem transferência automática de contas ou dados.
 
 ## Estrutura do núcleo
 
@@ -18,7 +18,7 @@ A migração foi preparada localmente. Não foi aplicada ao projeto online: a se
 
 Seis tabelas públicas, todas com RLS e vínculos a auth.users com ON DELETE CASCADE. Cada usuário autenticado lê apenas seus dados. Pode editar o perfil e criar/editar/excluir seus itens. Não pode modificar proprietário, identidade ou tipo de um item. Anônimos não acessam tabelas. Funções de trigger não têm EXECUTE público.
 
-Histórico, desfazer, cache idempotente e contexto são gravados somente pelo backend confiável (service_role). Essa chave nunca pode ir ao frontend. O backend deverá validar o JWT e derivar user_id dele, jamais confiar no user_id enviado pelo navegador. Não existe RPC pública para falsificar a confirmação de gravação. Não foi implementado nesta etapa o processamento transacional de chat/desfazer no Supabase.
+Histórico, desfazer, cache idempotente e contexto são gravados pelo backend confiável via PostgreSQL. A Vercel usa a conexão postgres pelo transaction pooler; a chave service_role é usada exclusivamente para excluir contas no Supabase Auth. Segredos nunca vão ao frontend. O backend valida a identidade no Supabase Auth e deriva user_id dela. Chat e desfazer são transacionais; gravação, histórico e resposta idempotente só são confirmados após COMMIT.
 
 Datas são timestamptz, com índices por proprietário, estado, tipo e vencimento. Triggers mantêm timestamps de criação/alteração de itens/perfis. Até três prioridades pendentes por conta: três slots com CHECK e UNIQUE tornam impossível gravar uma quarta, mesmo com uma seleção concorrente desatualizada. O trigger também serializa alocação por conta com advisory lock. Em disputa, o cliente deve tratar erros de integridade e recarregar; não prometer sucesso otimista.
 
@@ -41,6 +41,8 @@ npm run build
 
 Os testes usam PostgreSQL embarcado PGlite. O schema auth, a função auth.uid e as roles são simulações restritas ao teste. A migração real usa os objetos nativos do Supabase. Testes cobrem validação, UTC, RLS entre contas, bloqueio anônimo, histórico protegido, cascata de exclusão, idempotência, prioridades, perfis de contas preexistentes, timestamps e reaplicação recusada. PGlite não simula clientes concorrentes independentes; a garantia estrutural dos slots é testada, mas a disputa precisa de teste adicional no servidor real.
 
-## Integração do app pendente
+## Integração online
 
-Adaptar o backend/frontend ao Supabase Auth; mapear campos camelCase atuais para snake_case; implementar chat/CRUD/desfazer transacionais com confirmação somente após COMMIT; manter transcrição no servidor; testar exportação/exclusão completas. Migração de senhas scrypt/sessões SQLite não é automática: exige um plano de migração de contas e, se necessário, redefinição de senha. Não mudar silenciosamente a autenticação em produção.
+Supabase Auth, mapeamento camelCase/snake_case, CRUD/chat/desfazer transacionais, exportação e exclusão por cascata foram implementados e verificados no deploy real com duas contas descartáveis. A migração 202610100001_mentra_server_undo.sql preserva timestamps ao desfazer. Os testes online também verificaram concorrência real no limite de prioridades, replay idempotente e atualização de preferências. Veja ../ONLINE_DEPLOYMENT.md e ../VERIFICATION.md.
+
+Migração de senhas scrypt/sessões SQLite não é automática: exige um plano de migração de contas. Confirmação de e-mail temporariamente desativada por solicitação do usuário; SMTP próprio ainda não configurado. Voz depende da chave BRAINIALL do responsável.

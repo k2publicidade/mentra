@@ -4,7 +4,7 @@ Webapp PT-BR baseado no núcleo inicial de Mentra_Life_Mapa_de_Implementacao.pdf
 
 ## Publicação online
 
-O backend online de Vercel usa Supabase Auth e PostgreSQL transacional sem migrar nem tocar no SQLite local. Veja [ONLINE_DEPLOYMENT.md](ONLINE_DEPLOYMENT.md) para ordem das migrações, variáveis exclusivamente do servidor, confirmação de e-mail e verificações remotas ainda necessárias. A publicação não foi executada por esta implementação.
+O backend online de Vercel usa Supabase Auth e PostgreSQL transacional sem migrar nem tocar no SQLite local. Aplicação publicada em https://mentra-tawny.vercel.app. Veja [ONLINE_DEPLOYMENT.md](ONLINE_DEPLOYMENT.md) para configuração e [VERIFICATION.md](VERIFICATION.md) para evidências e pendências. A confirmação de e-mail está temporariamente desativada por solicitação do responsável.
 
 ## Rodar localmente
 

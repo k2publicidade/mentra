@@ -2,13 +2,29 @@
 
 Local mode is unchanged: `npm start` runs `server/index.js` and the existing SQLite database. Vercel uses `api/index.js`, which imports only the online backend, never SQLite, never starts a listener, and never falls back to a local database. Online accounts are new Supabase Auth accounts; no local accounts or data are migrated.
 
+## Verified remote configuration — October 10, 2026
+
+Production origin: `https://mentra-tawny.vercel.app`. Both migration definitions are present on the real database. All six tables have RLS enabled; owner policies, triggers, priority constraints and restricted trigger-function permissions were read back from PostgreSQL. No core migration was reapplied.
+
+Production secrets saved in Vercel: `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `DATABASE_URL`, `SESSION_SECRET`, `APP_ORIGIN`, `DATABASE_CA_CERT`. The transaction pooler is `aws-1-us-west-2.pooler.supabase.com:6543`. The official CA from the Database Settings download is required for this connection; verified TLS succeeded with it. Secrets are absent from this repository.
+
+Supabase Site URL is the production origin. Email/password signup is enabled. Email confirmation was explicitly disabled temporarily at the user's request because no custom SMTP is configured. Before requiring email confirmation again, configure and verify SMTP delivery. `VOICE_PROVIDER=brainiall` is selected; voice requires the user's `BRAINIALL_API_KEY` and provider credits.
+
+To repeat real deployed verification with disposable accounts (when email confirmation is disabled):
+
+```sh
+node scripts/verify-online.js --allow-test-accounts
+```
+
+This writes only uniquely named test accounts and deletes them through the app account-deletion API. It exercises real Auth, PostgreSQL mutations, isolation and concurrent requests. Use `APP_ORIGIN` to target another HTTPS deployment explicitly. Never use a personal account for cleanup tests.
+
 ## Required remote setup
 
 1. Project: `mmhvbjmetsuscnyzsvxg`. Apply SQL in this order:
-   - `supabase/migrations/202610090001_mentra_core.sql` **once**. The user reports applying it; that report has not been independently verified. Do not reapply it or drop existing tables.
-   - `supabase/migrations/202610100001_mentra_server_undo.sql` **once, after the core schema**. This incremental migration is still required. It preserves timestamps during server undo so undo chains remain safe. Anonymous/authenticated callers cannot use the timestamp override; it requires the database `postgres` or `service_role` role. Use the Supabase SQL editor / a migration workflow; the application never auto-migrates.
+   - `supabase/migrations/202610090001_mentra_core.sql` **once**. Its tables, policies, triggers and constraints have now been independently verified online. Do not reapply it or drop existing tables.
+   - `supabase/migrations/202610100001_mentra_server_undo.sql` **once, after the core schema**. Its function definition has now been independently verified online. It preserves timestamps during server undo so undo chains remain safe. Anonymous/authenticated callers cannot use the timestamp override; it requires the database `postgres` or `service_role` role. Use the Supabase SQL editor / a migration workflow; the application never auto-migrates.
 2. In Supabase Authentication, enable email/password signup, choose whether email confirmation is required, and configure the Site URL to the exact canonical HTTPS application origin. Keep the standard confirmation email link (`{{ .ConfirmationURL }}`) that verifies on Supabase. Users confirm their email and then log in through the app. No browser Supabase SDK or access token from a URL is trusted by the app. Configure production SMTP and verify delivery with a real test account; provider email delivery limits are not bypassed.
-3. Configure Vercel project root to this repository, Node **24.x**, build command `npm run build`, output directory `dist`. `vercel.json` routes `/api` and all `/api/*` requests to `api/index.js`; static files and SPA pages are served from the Vite output. Do not point Vercel at `server/index.js`. The repository must be supplied to Vercel by the owner; this implementation has not committed, pushed or deployed it.
+3. Configure Vercel project root to this repository, Node **24.x**, build command `npm run build`, output directory `dist`. `vercel.json` routes `/api` and all `/api/*` requests to `api/index.js`; static files and SPA pages are served from the Vite output. Do not point Vercel at `server/index.js`. The repository is connected to Vercel and production has been redeployed with the server settings above.
 4. Set the following **server-only** Vercel environment variables, then redeploy:
 
 | Variable | Value / requirements |
